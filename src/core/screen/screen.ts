@@ -1,6 +1,7 @@
 import {
   EngineClient,
   Locale,
+  PublicApi,
   ServerTemplateConfigType,
   ServerTemplateConfiguration,
   TemplateCategoryId,
@@ -234,11 +235,18 @@ export abstract class Screen<
     this._context = init.context;
     this._engineClient = createEngineClient(init.context, this.screen);
     this._gamemodeClient = createGamemodeClient(init.context);
-    this._localization = this.mapTemplateLocalization(init.localization as TLocalization);
+    this._defaultLocale = init.defaultLocale;
+    this._localization = init.localization
+      ? this.mapTemplateLocalization(init.localization as TLocalization)
+      : this.mapDefaultLocalization();
+
     this._serverConfiguration = init.serverConfiguration;
     this._locales = init.locales;
-    this._defaultLocale = init.defaultLocale;
-    this._templateConfiguration = this.mapTemplateConfiguration(init.templateConfiguration);
+    this._templateConfiguration = init.templateConfiguration
+      ? this.mapTemplateConfiguration(init.templateConfiguration)
+      : this.mapDefaultConfiguration();
+
+    await this.checkTemplateSubscription();
     await this.onInit();
   }
 
@@ -261,16 +269,7 @@ export abstract class Screen<
 
     templateConfiguration = {
       ...templateConfiguration,
-      ...(Object.keys(this.defaultSettings.configuration)
-        .filter((key) => !templateConfiguration[key])
-        .reduce((acc, key) => {
-          const config = this.defaultSettings.configuration[key];
-          acc[key] = {
-            type: config.type,
-            value: config.value,
-          } as TemplateConfig<ServerTemplateConfigType>;
-          return acc;
-        }, {} as TemplateConfiguration) as TTemplateConfiguration),
+      ...this.mapDefaultConfiguration(templateConfiguration),
     };
     return templateConfiguration;
   }
@@ -282,13 +281,43 @@ export abstract class Screen<
     }
     templateLocalization = {
       ...templateLocalization,
-      ...(Object.keys(this.defaultSettings.localization[this.context.locale].TEXTS)
-        .filter((key) => !templateLocalization[key])
-        .reduce((acc, key) => {
-          acc[key] = this.defaultSettings.localization[this.context.locale].TEXTS[key];
-          return acc;
-        }, {} as TemplateTextLocalization) as TLocalization),
+      ...this.mapDefaultLocalization(templateLocalization),
     };
     return templateLocalization;
+  }
+
+  private mapDefaultConfiguration(templateConfiguration?: TTemplateConfiguration) {
+    return Object.keys(this.defaultSettings.configuration)
+      .filter((key) => !templateConfiguration || !templateConfiguration[key])
+      .reduce((acc, key) => {
+        const config = this.defaultSettings.configuration[key];
+        acc[key] = {
+          type: config.type,
+          value: config.value,
+        } as TemplateConfig<ServerTemplateConfigType>;
+        return acc;
+      }, {} as TemplateConfiguration) as TTemplateConfiguration;
+  }
+
+  private mapDefaultLocalization(templateLocalization?: TLocalization) {
+    return Object.keys(this.defaultSettings.localization[this.context.locale].TEXTS)
+      .filter((key) => !templateLocalization || !templateLocalization[key])
+      .reduce((acc, key) => {
+        acc[key] = this.defaultSettings.localization[this.context.locale].TEXTS[key];
+        return acc;
+      }, {} as TemplateTextLocalization) as TLocalization;
+  }
+
+  private async checkTemplateSubscription() {
+    const publicApi = new PublicApi(this.engineClient);
+    const template = await publicApi.getTemplateById(this.context.templateId).catch((err) => {
+      throw new Error(`Template subscription check failed, reason: ${err.message}`);
+    });
+
+    if (!template?.categories?.some((p) => p.id === this.screen && p.isActive)) {
+      throw new Error(
+        `Template subscription not found for ${this.context.templateId}/${this.screen}`,
+      );
+    }
   }
 }

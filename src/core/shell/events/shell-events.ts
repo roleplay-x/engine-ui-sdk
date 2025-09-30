@@ -21,8 +21,8 @@ export interface ShellLocaleChanged {
 export interface ShellInitializeScreen {
   screen: ScreenType;
   context: SessionContext;
-  localization: TemplateTextLocalization;
-  templateConfiguration: Array<ServerTemplateConfiguration>;
+  localization?: TemplateTextLocalization;
+  templateConfiguration?: Array<ServerTemplateConfiguration>;
   serverConfiguration: ServerConfiguration;
   locales: Locale[];
   defaultLocale: string;
