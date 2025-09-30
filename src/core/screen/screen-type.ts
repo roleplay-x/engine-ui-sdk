@@ -1,1 +1,1 @@
-export { TemplateCategory as ScreenType } from '@roleplayx/engine-sdk';
+export { TemplateCategoryId as ScreenType } from '@roleplayx/engine-sdk';

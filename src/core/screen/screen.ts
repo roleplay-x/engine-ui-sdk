@@ -3,7 +3,7 @@ import {
   Locale,
   ServerTemplateConfigType,
   ServerTemplateConfiguration,
-  TemplateCategory,
+  TemplateCategoryId,
 } from '@roleplayx/engine-sdk';
 
 import { createEngineClient, createGamemodeClient, SessionContext } from '../context/context';
@@ -99,7 +99,7 @@ export abstract class Screen<
 
   public toast(notification: Toast) {
     this.shellBridge.emitToShell('screen:notifyScreen', {
-      screen: TemplateCategory.Toaster,
+      screen: TemplateCategoryId.Toaster,
       type: 'toast',
       data: notification,
     });

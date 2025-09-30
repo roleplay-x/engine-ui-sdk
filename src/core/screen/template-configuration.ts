@@ -1,4 +1,8 @@
-import { ConfigSelectOptionValue, ConfigTypeValueMap, ServerTemplateConfigType, } from '@roleplayx/engine-sdk';
+import {
+  ConfigSelectOptionValue,
+  ConfigTypeValueMap,
+  ServerTemplateConfigType,
+} from '@roleplayx/engine-sdk';
 
 export interface TemplateConfig<T extends ServerTemplateConfigType> {
   /**
