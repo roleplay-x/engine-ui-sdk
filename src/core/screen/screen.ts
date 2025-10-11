@@ -300,6 +300,10 @@ export abstract class Screen<
   }
 
   private mapDefaultLocalization(templateLocalization?: TLocalization) {
+    if (!this.defaultSettings.localization[this.context.locale]?.TEXTS) {
+      return templateLocalization;
+    }
+
     return Object.keys(this.defaultSettings.localization[this.context.locale].TEXTS)
       .filter((key) => !templateLocalization || !templateLocalization[key])
       .reduce((acc, key) => {

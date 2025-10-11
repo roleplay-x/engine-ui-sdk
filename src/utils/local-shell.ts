@@ -65,13 +65,13 @@ export class LocalShell {
       locales,
     };
 
-    window.parent.postMessage(
-      {
-        type: 'shell:initializeScreen',
-        payload,
-      },
-      '*',
-    );
+    const customEvent = new CustomEvent('shell:initializeScreen', {
+      detail: payload,
+      bubbles: true,
+      composed: true,
+    });
+
+    window.dispatchEvent(customEvent);
   }
 
   mapServerConfiguration(publicConfigs: ReadonlyArray<PublicConfig>): ServerConfiguration {
