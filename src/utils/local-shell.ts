@@ -20,12 +20,16 @@ export interface LocalShellInitializeScreen {
 
 export class LocalShell {
   constructor(private settings: LocalShellSettings) {
-    window.addEventListener('localShell:initializeScreen', this.onInitialize.bind(this));
+    window.addEventListener('message', this.onMessage.bind(this));
   }
 
-  private onInitialize(event: Event) {
-    const customEvent = event as CustomEvent<LocalShellInitializeScreen>;
-    return this.handleLocalShellInitialize(customEvent.detail);
+  private onMessage(event: MessageEvent) {
+    const { type, payload } = event.data;
+    console.log(`Received window message, type: ${type}`);
+    switch (type) {
+      case 'localShell:initializeScreen':
+        return this.handleLocalShellInitialize(payload);
+    }
   }
 
   private async handleLocalShellInitialize({

@@ -22,3 +22,4 @@ export * from './gamemode/session/api';
 export * from './screens/login/configuration';
 export * from './screens/login/screen';
 export * from './screens/toaster/screen';
+export * from './utils/local-shell';
