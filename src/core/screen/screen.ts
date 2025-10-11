@@ -34,8 +34,12 @@ export interface ScreenSettings<
   configuration: TemplateConfigurationSettings<TTemplateConfiguration>;
 }
 
+// eslint-disable-next-line @typescript-eslint/no-empty-object-type
+export interface ScreenConfiguration {}
+
 export abstract class Screen<
   TEvents extends ScreenEvents,
+  TScreenConfiguration extends ScreenConfiguration,
   TLocalization extends TemplateTextLocalization,
   TTemplateConfiguration extends TemplateConfiguration,
 > {
@@ -48,6 +52,7 @@ export abstract class Screen<
   private _localization: TLocalization | undefined;
   private _templateConfiguration: TTemplateConfiguration | undefined;
   private _serverConfiguration: ServerConfiguration | undefined;
+  private _configuration: TScreenConfiguration | undefined;
   private _locales: Locale[] | undefined;
   private _defaultLocale: string | undefined;
 
@@ -203,6 +208,18 @@ export abstract class Screen<
 
   protected emitError(error: string, details?: unknown) {
     this.shellBridge.emitToShell('screen:error', { error, details });
+  }
+
+  protected set screenConfiguration(configuration: TScreenConfiguration) {
+    this._configuration = configuration;
+  }
+
+  public get screenConfiguration(): TScreenConfiguration {
+    if (!this._configuration) {
+      throw new Error('Screen is not initialized');
+    }
+
+    return this._configuration;
   }
 
   protected navigateToScreen(toScreen: ScreenType, params?: unknown) {

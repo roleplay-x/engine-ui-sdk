@@ -12,10 +12,13 @@ export type Toast = {
 
 export type ToasterScreenEvents = ScreenEvents & { toast: Toast };
 
+// eslint-disable-next-line @typescript-eslint/no-empty-object-type
+export interface ToasterScreenConfiguration {}
+
 export class ToasterScreen<
   TLocalization extends TemplateTextLocalization,
   TConfiguration extends TemplateConfiguration,
-> extends Screen<ToasterScreenEvents, TLocalization, TConfiguration> {
+> extends Screen<ToasterScreenEvents, ToasterScreenConfiguration, TLocalization, TConfiguration> {
   constructor(defaultSettings: ScreenSettings<TLocalization, TConfiguration>) {
     super(ScreenType.Toaster, defaultSettings);
   }

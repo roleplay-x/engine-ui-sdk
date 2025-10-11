@@ -33,8 +33,7 @@ export type LoginScreenEvents = ScreenEvents;
 export class LoginScreen<
   TLocalization extends TemplateTextLocalization,
   TConfiguration extends TemplateConfiguration,
-> extends Screen<LoginScreenEvents, TLocalization, TConfiguration> {
-  private _configuration: LoginScreenConfiguration | undefined;
+> extends Screen<LoginScreenEvents, LoginScreenConfiguration, TLocalization, TConfiguration> {
   private _gamemodeAccountApi: GamemodeAccountApi | undefined;
   private _gamemodeSessionApi: GamemodeSessionApi | undefined;
   private _enginePublicApi: PublicApi | undefined;
@@ -44,19 +43,11 @@ export class LoginScreen<
   }
 
   protected async onInit(): Promise<void> {
-    this._configuration = this.mapConfiguration();
+    this.screenConfiguration = this.mapConfiguration();
     this._gamemodeAccountApi = new GamemodeAccountApi(this.gamemodeClient);
     this._gamemodeSessionApi = new GamemodeSessionApi(this.gamemodeClient);
     this._enginePublicApi = new PublicApi(this.engineClient);
     return super.onInit();
-  }
-
-  public get screenConfiguration(): LoginScreenConfiguration {
-    if (!this._configuration) {
-      throw new Error('Screen is not initialized');
-    }
-
-    return this._configuration;
   }
 
   public register(request: RegisterAccountRequest): Promise<Account> {
