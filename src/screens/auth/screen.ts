@@ -57,6 +57,7 @@ export class AuthScreen<
   public async authWithPassword(
     request: AccountAuthRequest,
     onEmailVerificationPending: () => void | Promise<void>,
+    onEmailAddressIsMissing: () => void | Promise<void>,
   ): Promise<SessionInfo | undefined> {
     try {
       const result = await this.gamemodeAccountApi.authWithPassword(request);
@@ -64,6 +65,11 @@ export class AuthScreen<
     } catch (err) {
       if (this.handleEmailVerificationRequiredError(err as Error)) {
         onEmailVerificationPending();
+        return;
+      }
+
+      if (this.handleEmailAddressIsMissingError(err as Error)) {
+        onEmailAddressIsMissing();
         return;
       }
 
@@ -122,6 +128,10 @@ export class AuthScreen<
 
   private handleEmailVerificationRequiredError(error: Error): boolean {
     return error instanceof EngineError && error.key === 'EMAIL_VERIFICATION_REQUIRED';
+  }
+
+  private handleEmailAddressIsMissingError(error: Error): boolean {
+    return error instanceof EngineError && error.key === 'EMAIL_ADDRESS_IS_MISSING';
   }
 
   private mapConfiguration(): AuthScreenConfiguration {
