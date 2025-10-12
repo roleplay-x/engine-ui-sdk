@@ -19,11 +19,7 @@ import { ServerConfiguration } from '../server/server-configuration';
 import { ScreenEvents } from './events/events';
 import { ScreenType } from './screen-type';
 import { TemplateLocalizationSettings, TemplateTextLocalization } from './template-localization';
-import {
-  TemplateConfig,
-  TemplateConfiguration,
-  TemplateConfigurationSettings,
-} from './template-configuration';
+import { TemplateConfig, TemplateConfiguration, TemplateConfigurationSettings, } from './template-configuration';
 import { ScreenNotification } from './screen-notification';
 
 export interface ScreenSettings<
@@ -151,10 +147,10 @@ export abstract class Screen<
   }
 
   public get locale(): string {
-    if (!this._locale) {
+    if (!this._locales) {
       throw new Error('Screen is not initialized');
     }
-    return this._locale;
+    return this._locale ?? this._defaultLocale ?? 'en-US';
   }
 
   public get isInitialized(): boolean {
