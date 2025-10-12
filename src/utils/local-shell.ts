@@ -62,7 +62,7 @@ export class LocalShell {
       },
       serverConfiguration,
       locale: locale ?? 'en-US',
-      defaultLocale: serverConfiguration.DEFAULT_LANGUAGE?.key ?? 'en-US',
+      defaultLocale: serverConfiguration.DEFAULT_LANGUAGE?.value?.key ?? 'en-US',
       locales,
     };
 

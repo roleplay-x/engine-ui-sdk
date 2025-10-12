@@ -19,7 +19,11 @@ import { ServerConfiguration } from '../server/server-configuration';
 import { ScreenEvents } from './events/events';
 import { ScreenType } from './screen-type';
 import { TemplateLocalizationSettings, TemplateTextLocalization } from './template-localization';
-import { TemplateConfig, TemplateConfiguration, TemplateConfigurationSettings, } from './template-configuration';
+import {
+  TemplateConfig,
+  TemplateConfiguration,
+  TemplateConfigurationSettings,
+} from './template-configuration';
 import { ScreenNotification } from './screen-notification';
 
 export interface ScreenSettings<
