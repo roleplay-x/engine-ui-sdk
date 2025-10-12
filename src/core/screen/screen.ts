@@ -92,7 +92,7 @@ export abstract class Screen<
 
     this._initialized = true;
     this.emitToShell('screen:initialized', {
-      screen: ScreenType.Login,
+      screen: ScreenType.Auth,
       templateId: this._context.templateId,
     });
   }

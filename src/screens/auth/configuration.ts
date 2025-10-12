@@ -1,6 +1,6 @@
 import { ExternalLoginIdentifierType } from '@roleplayx/engine-sdk';
 
-export interface LoginScreenConfiguration {
+export interface AuthScreenConfiguration {
   usernameRegex: string;
   emailRequired: boolean;
   emailVerificationRequired: boolean;

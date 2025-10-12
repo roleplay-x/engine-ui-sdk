@@ -26,20 +26,20 @@ import { ImplicitDiscordAuthApiRequest } from '../../gamemode/account/request/im
 import { DiscordOAuthTokenApiRequest } from '../../gamemode/account/request/discord-oauth-token.api-request';
 import { GamemodeSessionApi } from '../../gamemode/session/api';
 
-import { LoginScreenConfiguration } from './configuration';
+import { AuthScreenConfiguration } from './configuration';
 
-export type LoginScreenEvents = ScreenEvents;
+export type AuthScreenEvents = ScreenEvents;
 
-export class LoginScreen<
+export class AuthScreen<
   TLocalization extends TemplateTextLocalization,
   TConfiguration extends TemplateConfiguration,
-> extends Screen<LoginScreenEvents, LoginScreenConfiguration, TLocalization, TConfiguration> {
+> extends Screen<AuthScreenEvents, AuthScreenConfiguration, TLocalization, TConfiguration> {
   private _gamemodeAccountApi: GamemodeAccountApi | undefined;
   private _gamemodeSessionApi: GamemodeSessionApi | undefined;
   private _enginePublicApi: PublicApi | undefined;
 
   constructor(defaultSettings: ScreenSettings<TLocalization, TConfiguration>) {
-    super(ScreenType.Login, defaultSettings);
+    super(ScreenType.Auth, defaultSettings);
   }
 
   protected async onInit(): Promise<void> {
@@ -124,8 +124,8 @@ export class LoginScreen<
     return error instanceof EngineError && error.key === 'EMAIL_VERIFICATION_REQUIRED';
   }
 
-  private mapConfiguration(): LoginScreenConfiguration {
-    let configuration: LoginScreenConfiguration = {
+  private mapConfiguration(): AuthScreenConfiguration {
+    let configuration: AuthScreenConfiguration = {
       usernameRegex: this.serverConfiguration.ACCOUNT_USERNAME_REGEX.value.expression,
       emailRequired: this.serverConfiguration.ACCOUNT_EMAIL_REQUIRED.value,
       emailVerificationRequired: this.serverConfiguration.ACCOUNT_EMAIL_VERIFICATION_REQUIRED.value,
