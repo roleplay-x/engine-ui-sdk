@@ -55,11 +55,14 @@ export abstract class Screen<
   private _configuration: TScreenConfiguration | undefined;
   private _locales: Locale[] | undefined;
   private _defaultLocale: string | undefined;
+  private _locale: string | undefined;
+  private _initialized: boolean;
 
   protected constructor(
     protected readonly screen: ScreenType,
     private readonly defaultSettings: ScreenSettings<TLocalization, TTemplateConfiguration>,
   ) {
+    this._initialized = false;
     this.shellBridge = new ShellBridge(screen);
     this.eventEmitter = new UIEventEmitter<TEvents>();
   }
@@ -87,6 +90,7 @@ export abstract class Screen<
       throw new Error('Screen is not initialized');
     }
 
+    this._initialized = true;
     this.emitToShell('screen:initialized', {
       screen: ScreenType.Login,
       templateId: this._context.templateId,
@@ -146,6 +150,17 @@ export abstract class Screen<
     return this._locales;
   }
 
+  public get locale(): string {
+    if (!this._locale) {
+      throw new Error('Screen is not initialized');
+    }
+    return this._locale;
+  }
+
+  public get isInitialized(): boolean {
+    return this._initialized;
+  }
+
   protected emit<E extends keyof TEvents>(event: E, payload: TEvents[E]): boolean {
     return this.eventEmitter.emit(event, payload);
   }
@@ -199,10 +214,11 @@ export abstract class Screen<
     this._gamemodeClient?.changeLocale(locale);
     this._engineClient?.changeLocale(locale);
     this._localization = this.mapTemplateLocalization(localization as TLocalization);
+    this._locale = locale;
     this.eventEmitter.emit('localeChanged', { locale, localization: this._localization });
   }
 
-  protected changeLocale(locale: string) {
+  public changeLocale(locale: string) {
     this.shellBridge.emitToShell('screen:changeLocale', { fromScreen: this.screen, locale });
   }
 

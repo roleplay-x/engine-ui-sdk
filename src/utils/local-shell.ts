@@ -61,6 +61,7 @@ export class LocalShell {
         sessionToken,
       },
       serverConfiguration,
+      locale: locale ?? 'en-US',
       defaultLocale: serverConfiguration.DEFAULT_LANGUAGE?.key ?? 'en-US',
       locales,
     };

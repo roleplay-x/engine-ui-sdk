@@ -26,4 +26,5 @@ export interface ShellInitializeScreen {
   serverConfiguration: ServerConfiguration;
   locales: Locale[];
   defaultLocale: string;
+  locale: string;
 }

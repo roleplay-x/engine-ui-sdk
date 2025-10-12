@@ -38,6 +38,7 @@ export class ShellBridge {
     serverConfiguration,
     locales,
     defaultLocale,
+    locale,
   }: ShellInitializeScreen) {
     if (screen !== this.screen) {
       return;
@@ -53,6 +54,7 @@ export class ShellBridge {
       serverConfiguration,
       locales,
       defaultLocale,
+      locale,
     });
   }
 
