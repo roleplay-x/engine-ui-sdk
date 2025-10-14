@@ -16,7 +16,7 @@ import {
   SessionInfo,
 } from '@roleplayx/engine-sdk';
 
-import { Screen, ScreenSettings } from '../../core/screen/screen';
+import { Screen, ScreenCallback, ScreenMode, ScreenSettings } from '../../core/screen/screen';
 import { ScreenType } from '../../core/screen/screen-type';
 import { ScreenEvents } from '../../core/screen/events/events';
 import { TemplateTextLocalization } from '../../core/screen/template-localization';
@@ -28,7 +28,14 @@ import { GamemodeSessionApi } from '../../gamemode/session/api';
 
 import { AuthScreenConfiguration } from './configuration';
 
-export type AuthScreenEvents = ScreenEvents;
+export type DiscordOAuthCallbackPayload = {
+  code: string;
+  error: string;
+};
+
+export type AuthScreenEvents = ScreenEvents & { discordOAuthCallback: DiscordOAuthCallbackPayload };
+
+export type AuthScreenCallbacks = 'discordOAuth';
 
 export class AuthScreen<
   TLocalization extends TemplateTextLocalization,
@@ -42,12 +49,12 @@ export class AuthScreen<
     super(ScreenType.Auth, defaultSettings);
   }
 
-  protected async onInit(): Promise<void> {
+  protected async onInit({ mode }: { mode: ScreenMode }): Promise<void> {
     this.screenConfiguration = this.mapConfiguration();
     this._gamemodeAccountApi = new GamemodeAccountApi(this.gamemodeClient);
     this._gamemodeSessionApi = new GamemodeSessionApi(this.gamemodeClient);
     this._enginePublicApi = new PublicApi(this.engineClient);
-    return super.onInit();
+    return super.onInit({ mode });
   }
 
   public register(request: RegisterAccountRequest): Promise<Account> {
@@ -124,6 +131,14 @@ export class AuthScreen<
 
   public resendEmailVerification(request: ResendEmailVerificationRequest) {
     return this.enginePublicApi.resendEmailVerification(request);
+  }
+
+  protected onCallback(callback: ScreenCallback): void | Promise<void> {
+    switch (callback.type as AuthScreenCallbacks) {
+      case 'discordOAuth':
+        this.emit('discordOAuthCallback', callback.payload as DiscordOAuthCallbackPayload);
+        break;
+    }
   }
 
   private handleEmailVerificationRequiredError(error: Error): boolean {

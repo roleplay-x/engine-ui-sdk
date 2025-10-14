@@ -5,7 +5,7 @@ import { TemplateTextLocalization } from '../../core/screen/template-localizatio
 import { TemplateConfiguration } from '../../core/screen/template-configuration';
 
 export type Toast = {
-  type: 'INFO' | 'ERROR' | 'WARN';
+  type: 'INFO' | 'ERROR' | 'WARN' | 'TIP';
   title: string;
   message: string;
 };

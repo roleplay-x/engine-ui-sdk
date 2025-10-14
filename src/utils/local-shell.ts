@@ -3,6 +3,7 @@ import { EngineClient, PublicApi, PublicConfig } from '@roleplayx/engine-sdk';
 import { ShellInitializeScreen } from '../core/shell/events/shell-events';
 import { ScreenType } from '../core/screen/screen-type';
 import { ServerConfiguration } from '../core/server/server-configuration';
+import { ScreenCallback, ScreenDataPayload, ScreenMode } from '../core/screen/screen';
 
 export interface LocalShellSettings {
   templateId: string;
@@ -16,6 +17,9 @@ export interface LocalShellInitializeScreen {
   sessionId: string;
   sessionToken: string;
   locale?: string;
+  mode?: ScreenMode;
+  data?: ScreenDataPayload;
+  callback?: ScreenCallback;
 }
 
 export class LocalShell {
@@ -25,7 +29,6 @@ export class LocalShell {
 
   private onMessage(event: MessageEvent) {
     const { type, payload } = event.data;
-    console.log(`Received window message, type: ${type}`);
     switch (type) {
       case 'localShell:initializeScreen':
         return this.handleLocalShellInitialize(payload);
@@ -37,6 +40,9 @@ export class LocalShell {
     locale,
     sessionId,
     sessionToken,
+    mode,
+    data,
+    callback,
   }: LocalShellInitializeScreen) {
     const engineClient = new EngineClient({
       locale: locale ?? 'en-US',
@@ -64,6 +70,9 @@ export class LocalShell {
       locale: locale ?? 'en-US',
       defaultLocale: serverConfiguration.DEFAULT_LANGUAGE?.value?.key ?? 'en-US',
       locales,
+      mode: mode ?? 'SCREEN',
+      data,
+      callback,
     };
 
     const customEvent = new CustomEvent('shell:initializeScreen', {

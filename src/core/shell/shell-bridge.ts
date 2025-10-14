@@ -2,7 +2,13 @@ import { SessionContext } from '../context/context';
 import { UIEventEmitter } from '../events/event-emitter';
 import { ScreenType } from '../screen/screen-type';
 
-import { ShellEvents, ShellInitializeScreen, ShellLocaleChanged } from './events/shell-events';
+import {
+  ShellCallbackScreen,
+  ShellEvents,
+  ShellInitializeScreen,
+  ShellLocaleChanged,
+  ShellUpdateScreenData,
+} from './events/shell-events';
 import { UIEvents } from './events/ui-events';
 
 export class ShellBridge {
@@ -17,12 +23,24 @@ export class ShellBridge {
 
   private setupEventListeners() {
     window.addEventListener('shell:initializeScreen', this.onInitialize.bind(this));
+    window.addEventListener('shell:callbackScreen', this.onCallback.bind(this));
+    window.addEventListener('shell:updateScreenData', this.onDataUpdated.bind(this));
     window.addEventListener('shell:localeChanged', this.onLocaleChanged.bind(this));
   }
 
   private onInitialize(event: Event) {
     const customEvent = event as CustomEvent<ShellInitializeScreen>;
     return this.handleShellInitialize(customEvent.detail);
+  }
+
+  private onCallback(event: Event) {
+    const customEvent = event as CustomEvent<ShellCallbackScreen>;
+    return this.handleShellCallback(customEvent.detail);
+  }
+
+  private onDataUpdated(event: Event) {
+    const customEvent = event as CustomEvent<ShellUpdateScreenData>;
+    return this.handleShellDataUpdated(customEvent.detail);
   }
 
   private onLocaleChanged(event: Event) {
@@ -39,6 +57,9 @@ export class ShellBridge {
     locales,
     defaultLocale,
     locale,
+    mode,
+    data,
+    callback,
   }: ShellInitializeScreen) {
     if (screen !== this.screen) {
       return;
@@ -55,6 +76,32 @@ export class ShellBridge {
       locales,
       defaultLocale,
       locale,
+      mode,
+      data,
+      callback,
+    });
+  }
+
+  private handleShellCallback({ screen, type, payload }: ShellCallbackScreen) {
+    if (screen !== this.screen) {
+      return;
+    }
+
+    this.shellEmitter.emit('shell:callbackScreen', {
+      screen: this.screen,
+      type,
+      payload,
+    });
+  }
+
+  private handleShellDataUpdated({ screen, data }: ShellUpdateScreenData) {
+    if (screen !== this.screen) {
+      return;
+    }
+
+    this.shellEmitter.emit('shell:updateScreenData', {
+      screen: this.screen,
+      data,
     });
   }
 

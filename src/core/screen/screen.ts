@@ -11,7 +11,12 @@ import { createEngineClient, createGamemodeClient, SessionContext } from '../con
 import { GamemodeClient } from '../../gamemode/client';
 import { ShellBridge } from '../shell/shell-bridge';
 import { EventListener, UIEventEmitter } from '../events/event-emitter';
-import { ShellEvents, ShellInitializeScreen } from '../shell/events/shell-events';
+import {
+  ShellCallbackScreen,
+  ShellEvents,
+  ShellInitializeScreen,
+  ShellUpdateScreenData,
+} from '../shell/events/shell-events';
 import { UIEvents } from '../shell/events/ui-events';
 import { Toast } from '../../screens/toaster/screen';
 import { ServerConfiguration } from '../server/server-configuration';
@@ -26,6 +31,12 @@ import {
 } from './template-configuration';
 import { ScreenNotification } from './screen-notification';
 
+export type ScreenDataPayload = unknown;
+
+export type ScreenCallbackPayload = unknown;
+
+export type ScreenCallback = { type: string; payload: ScreenCallbackPayload };
+
 export interface ScreenSettings<
   TLocalization extends TemplateTextLocalization,
   TTemplateConfiguration extends TemplateConfiguration,
@@ -36,6 +47,8 @@ export interface ScreenSettings<
 
 // eslint-disable-next-line @typescript-eslint/no-empty-object-type
 export interface ScreenConfiguration {}
+
+export type ScreenMode = 'SCREEN' | 'CALLBACK';
 
 export abstract class Screen<
   TEvents extends ScreenEvents,
@@ -57,6 +70,7 @@ export abstract class Screen<
   private _defaultLocale: string | undefined;
   private _locale: string | undefined;
   private _initialized: boolean;
+  private _initialCallback?: ScreenCallback;
 
   protected constructor(
     protected readonly screen: ScreenType,
@@ -70,6 +84,14 @@ export abstract class Screen<
   public readyToInitialize() {
     this.onShell('shell:initializeScreen', async (init: ShellInitializeScreen) => {
       await this.setup(init);
+    });
+
+    this.onShell('shell:callbackScreen', async (callback: ShellCallbackScreen) => {
+      await this.onCallback(callback);
+    });
+
+    this.onShell('shell:updateScreenData', async ({ data }: ShellUpdateScreenData) => {
+      await this.onDataUpdated(data);
     });
 
     this.onShell('shell:localeChanged', ({ locale, localization }) => {
@@ -95,6 +117,10 @@ export abstract class Screen<
       screen: ScreenType.Auth,
       templateId: this._context.templateId,
     });
+
+    if (this._initialCallback) {
+      this.onCallback(this._initialCallback);
+    }
   }
 
   public on<E extends keyof TEvents>(event: E, listener: EventListener<TEvents[E]>): this {
@@ -200,8 +226,8 @@ export abstract class Screen<
     return this._context;
   }
 
-  protected async onInit(): Promise<void> {
-    this.eventEmitter.emit('init', { screen: this.screen });
+  protected async onInit({ mode }: { mode: ScreenMode; data?: ScreenDataPayload }): Promise<void> {
+    this.eventEmitter.emit('init', { screen: this.screen, mode });
   }
 
   protected async onLocaleChanged({
@@ -264,6 +290,10 @@ export abstract class Screen<
     return this.shellBridge.emitToShell(event, payload);
   }
 
+  protected onCallback(callback: ScreenCallback): void | Promise<void> {}
+
+  protected onDataUpdated(data: ScreenDataPayload): void | Promise<void> {}
+
   private async setup(init: ShellInitializeScreen) {
     this._context = init.context;
     this._engineClient = createEngineClient(init.context, this.screen);
@@ -279,8 +309,9 @@ export abstract class Screen<
       ? this.mapTemplateConfiguration(init.templateConfiguration)
       : this.mapDefaultConfiguration();
 
+    this._initialCallback = init.callback;
     await this.checkTemplateSubscription();
-    await this.onInit();
+    await this.onInit({ mode: init.mode, data: init.data });
   }
 
   private onNotification(notification: ScreenNotification) {
