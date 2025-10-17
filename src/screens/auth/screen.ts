@@ -90,9 +90,21 @@ export class AuthScreen<
     return this.gamemodeAccountApi.preAuthExternalLogin(request);
   }
 
-  public async authExternalLogin(request: ExternalLoginAuthRequest): Promise<SessionInfo> {
-    const result = await this.gamemodeAccountApi.authExternalLogin(request);
-    return this.authorizeSession(result);
+  public async authExternalLogin(
+    request: ExternalLoginAuthRequest,
+    onEmailVerificationPending: () => void | Promise<void>,
+  ): Promise<SessionInfo | undefined> {
+    try {
+      const result = await this.gamemodeAccountApi.authExternalLogin(request);
+      return this.authorizeSession(result);
+    } catch (err) {
+      if (this.handleEmailVerificationRequiredError(err as Error)) {
+        onEmailVerificationPending();
+        return;
+      }
+
+      throw err;
+    }
   }
 
   public async authDiscordImplicitFlow(
