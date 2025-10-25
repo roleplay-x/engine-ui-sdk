@@ -107,7 +107,7 @@ export class CharacterSelectionScreen<
   }
 
   get charactersCount(): number {
-    if (!this._charactersCount) {
+    if (this._charactersCount === undefined) {
       throw new Error('Screen is not initialized');
     }
 
@@ -115,7 +115,7 @@ export class CharacterSelectionScreen<
   }
 
   get maxCharactersCount(): number {
-    if (!this._maxCharactersCount) {
+    if (this._maxCharactersCount === undefined) {
       throw new Error('Screen is not initialized');
     }
 
