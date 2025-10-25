@@ -17,9 +17,10 @@ import {
   ShellInitializeScreen,
   ShellUpdateScreenData,
 } from '../shell/events/shell-events';
-import { UIEvents } from '../shell/events/ui-events';
+import { ScreenShellEvents } from '../shell/events/screen-shell-events';
 import { Toast } from '../../screens/toaster/screen';
 import { ServerConfiguration } from '../server/server-configuration';
+import { ScreenClientEvents } from '../shell/events/screen-client-events';
 
 import { ScreenEvents } from './events/events';
 import { ScreenType } from './screen-type';
@@ -81,6 +82,8 @@ export abstract class Screen<
     this.eventEmitter = new UIEventEmitter<TEvents>();
   }
 
+  protected abstract hideLoadingOnLoad(): boolean;
+
   public readyToInitialize() {
     this.onShell('shell:initializeScreen', async (init: ShellInitializeScreen) => {
       await this.setup(init);
@@ -114,13 +117,27 @@ export abstract class Screen<
 
     this._initialized = true;
     this.emitToShell('screen:initialized', {
-      screen: ScreenType.Auth,
+      screen: this.screen,
       templateId: this._context.templateId,
+      hideLoading: this.hideLoadingOnLoad(),
     });
 
     if (this._initialCallback) {
       this.onCallback(this._initialCallback);
     }
+  }
+
+  public showLoading(text?: string) {
+    this.emitToShell('screen:showLoading', {
+      fromScreen: this.screen,
+      text: text ?? '',
+    });
+  }
+
+  public hideLoading() {
+    this.emitToShell('screen:hideLoading', {
+      fromScreen: this.screen,
+    });
   }
 
   public on<E extends keyof TEvents>(event: E, listener: EventListener<TEvents[E]>): this {
@@ -286,8 +303,15 @@ export abstract class Screen<
     this.shellBridge.offShellEvent(event, listener);
   }
 
-  protected emitToShell<E extends keyof UIEvents>(event: E, payload: UIEvents[E]) {
+  protected emitToShell<E extends keyof ScreenShellEvents>(
+    event: E,
+    payload: ScreenShellEvents[E],
+  ) {
     return this.shellBridge.emitToShell(event, payload);
+  }
+
+  protected emitToClient<E extends ScreenClientEvents, K extends keyof E>(event: K, payload: E[K]) {
+    return this.shellBridge.emitToClient(this.screen, event, payload);
   }
 
   protected onCallback(callback: ScreenCallback): void | Promise<void> {}

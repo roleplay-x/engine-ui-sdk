@@ -9,7 +9,8 @@ import {
   ShellLocaleChanged,
   ShellUpdateScreenData,
 } from './events/shell-events';
-import { UIEvents } from './events/ui-events';
+import { ScreenShellEvents } from './events/screen-shell-events';
+import { ScreenClientEvents } from './events/screen-client-events';
 
 export class ShellBridge {
   private shellEmitter: UIEventEmitter<ShellEvents>;
@@ -117,7 +118,7 @@ export class ShellBridge {
     this.shellEmitter.emit('shell:localeChanged', event);
   }
 
-  emitToShell<E extends keyof UIEvents>(event: E, payload: UIEvents[E]) {
+  emitToShell<E extends keyof ScreenShellEvents>(event: E, payload: ScreenShellEvents[E]) {
     const customEvent = new CustomEvent(event, {
       detail: payload,
       bubbles: true,
@@ -125,14 +126,26 @@ export class ShellBridge {
     });
     window.dispatchEvent(customEvent);
 
-    // Also emit via postMessage (for cross-origin)
     window.parent.postMessage(
       {
-        type: `UI:${this.screen}:${String(event).toUpperCase().replace(/-/g, '_')}`,
+        type: `${this.screen}:${event}`,
         payload,
       },
       '*',
     );
+  }
+
+  emitToClient<E extends ScreenClientEvents, K extends keyof E>(
+    screen: ScreenType,
+    event: K,
+    payload: E[K],
+  ) {
+    const customEvent = new CustomEvent(`${screen}:${event as string}`, {
+      detail: payload,
+      bubbles: true,
+      composed: true,
+    });
+    window.dispatchEvent(customEvent);
   }
 
   onShellEvent<E extends keyof ShellEvents>(event: E, listener: (payload: ShellEvents[E]) => void) {

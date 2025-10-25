@@ -22,4 +22,8 @@ export class ToasterScreen<
   constructor(defaultSettings: ScreenSettings<TLocalization, TConfiguration>) {
     super(ScreenType.Toaster, defaultSettings);
   }
+
+  protected hideLoadingOnLoad(): boolean {
+    return false;
+  }
 }

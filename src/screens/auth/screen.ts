@@ -16,7 +16,13 @@ import {
   SessionInfo,
 } from '@roleplayx/engine-sdk';
 
-import { Screen, ScreenCallback, ScreenMode, ScreenSettings } from '../../core/screen/screen';
+import {
+  Screen,
+  ScreenCallback,
+  ScreenDataPayload,
+  ScreenMode,
+  ScreenSettings,
+} from '../../core/screen/screen';
 import { ScreenType } from '../../core/screen/screen-type';
 import { ScreenEvents } from '../../core/screen/events/events';
 import { TemplateTextLocalization } from '../../core/screen/template-localization';
@@ -37,6 +43,12 @@ export type AuthScreenEvents = ScreenEvents & { discordOAuthCallback: DiscordOAu
 
 export type AuthScreenCallbacks = 'discordOAuth';
 
+export interface SessionAuthOptions {
+  showLoading: boolean;
+  loadingText?: string;
+  onBeforeSessionAuth: () => Promise<void>;
+}
+
 export class AuthScreen<
   TLocalization extends TemplateTextLocalization,
   TConfiguration extends TemplateConfiguration,
@@ -49,12 +61,18 @@ export class AuthScreen<
     super(ScreenType.Auth, defaultSettings);
   }
 
-  protected async onInit({ mode }: { mode: ScreenMode }): Promise<void> {
+  protected async onInit({
+    mode,
+    data,
+  }: {
+    mode: ScreenMode;
+    data?: ScreenDataPayload;
+  }): Promise<void> {
     this.screenConfiguration = this.mapConfiguration();
     this._gamemodeAccountApi = new GamemodeAccountApi(this.gamemodeClient);
     this._gamemodeSessionApi = new GamemodeSessionApi(this.gamemodeClient);
     this._enginePublicApi = new PublicApi(this.engineClient);
-    return super.onInit({ mode });
+    return super.onInit({ mode, data });
   }
 
   public register(request: RegisterAccountRequest): Promise<Account> {
@@ -65,10 +83,11 @@ export class AuthScreen<
     request: AccountAuthRequest,
     onEmailVerificationPending: () => void | Promise<void>,
     onEmailAddressIsMissing: () => void | Promise<void>,
+    options?: SessionAuthOptions,
   ): Promise<SessionInfo | undefined> {
     try {
       const result = await this.gamemodeAccountApi.authWithPassword(request);
-      return await this.authorizeSession(result);
+      return await this.authorizeSession(result, options);
     } catch (err) {
       if (this.handleEmailVerificationRequiredError(err as Error)) {
         onEmailVerificationPending();
@@ -93,10 +112,11 @@ export class AuthScreen<
   public async authExternalLogin(
     request: ExternalLoginAuthRequest,
     onEmailVerificationPending: () => void | Promise<void>,
+    options?: SessionAuthOptions,
   ): Promise<SessionInfo | undefined> {
     try {
       const result = await this.gamemodeAccountApi.authExternalLogin(request);
-      return this.authorizeSession(result);
+      return this.authorizeSession(result, options);
     } catch (err) {
       if (this.handleEmailVerificationRequiredError(err as Error)) {
         onEmailVerificationPending();
@@ -110,10 +130,11 @@ export class AuthScreen<
   public async authDiscordImplicitFlow(
     request: ImplicitDiscordAuthApiRequest,
     onEmailVerificationPending: () => void | Promise<void>,
+    options?: SessionAuthOptions,
   ): Promise<SessionInfo | undefined> {
     try {
       const result = await this.gamemodeAccountApi.authDiscordImplicitFlow(request);
-      return await this.authorizeSession(result);
+      return await this.authorizeSession(result, options);
     } catch (err) {
       if (this.handleEmailVerificationRequiredError(err as Error)) {
         onEmailVerificationPending();
@@ -124,9 +145,12 @@ export class AuthScreen<
     }
   }
 
-  public async authDiscordOAuthFlow(request: DiscordOAuthTokenApiRequest): Promise<SessionInfo> {
+  public async authDiscordOAuthFlow(
+    request: DiscordOAuthTokenApiRequest,
+    options?: SessionAuthOptions,
+  ): Promise<SessionInfo> {
     const result = await this.gamemodeAccountApi.authDiscordOAuthFlow(request);
-    return this.authorizeSession(result);
+    return this.authorizeSession(result, options);
   }
 
   public getDiscordOAuthAuthorizeUrl(): Promise<RedirectUri> {
@@ -204,8 +228,27 @@ export class AuthScreen<
     return configuration;
   }
 
-  private authorizeSession(result: GrantAccessResult): Promise<SessionInfo> {
-    return this.gamemodeSessionApi.authorizeSession({ accessToken: result.access_token });
+  private async authorizeSession(
+    result: GrantAccessResult,
+    options?: SessionAuthOptions,
+  ): Promise<SessionInfo> {
+    try {
+      if (options?.showLoading) {
+        this.showLoading(options?.loadingText ?? 'Loading');
+      }
+
+      if (options?.onBeforeSessionAuth) {
+        await options.onBeforeSessionAuth();
+      }
+
+      return this.gamemodeSessionApi.authorizeSession({ accessToken: result.access_token });
+    } catch (err) {
+      if (options?.showLoading) {
+        this.hideLoading();
+      }
+
+      throw err;
+    }
   }
 
   private get gamemodeAccountApi(): GamemodeAccountApi {
@@ -227,5 +270,9 @@ export class AuthScreen<
       throw new Error('Screen is not initialized');
     }
     return this._enginePublicApi;
+  }
+
+  protected hideLoadingOnLoad(): boolean {
+    return true;
   }
 }
