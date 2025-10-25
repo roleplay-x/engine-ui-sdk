@@ -4,6 +4,7 @@ import { ShellInitializeScreen } from '../core/shell/events/shell-events';
 import { ScreenType } from '../core/screen/screen-type';
 import { ServerConfiguration } from '../core/server/server-configuration';
 import { ScreenCallback, ScreenDataPayload, ScreenMode } from '../core/screen/screen';
+import { ScreenNotification } from '../core/screen/screen-notification';
 
 export interface LocalShellSettings {
   templateId: string;
@@ -32,6 +33,8 @@ export class LocalShell {
     switch (type) {
       case 'localShell:initializeScreen':
         return this.handleLocalShellInitialize(payload);
+      case 'localShell:notification':
+        return this.handleLocalShellNotifyScreen(payload);
     }
   }
 
@@ -77,6 +80,16 @@ export class LocalShell {
 
     const customEvent = new CustomEvent('shell:initializeScreen', {
       detail: payload,
+      bubbles: true,
+      composed: true,
+    });
+
+    window.dispatchEvent(customEvent);
+  }
+
+  private async handleLocalShellNotifyScreen(notification: ScreenNotification) {
+    const customEvent = new CustomEvent('shell:notification', {
+      detail: notification,
       bubbles: true,
       composed: true,
     });
