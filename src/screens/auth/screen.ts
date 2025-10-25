@@ -46,7 +46,7 @@ export type AuthScreenCallbacks = 'discordOAuth';
 export interface SessionAuthOptions {
   showLoading: boolean;
   loadingText?: string;
-  onBeforeSessionAuth: () => Promise<void>;
+  onBeforeSessionAuth?: () => Promise<void>;
 }
 
 export class AuthScreen<
