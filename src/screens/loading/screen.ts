@@ -33,6 +33,7 @@ export class LoadingScreen<
       this._text = loadingData.text || '';
     }
 
+    this.screenConfiguration = {};
     return super.onInit({ mode, data });
   }
 

@@ -371,7 +371,7 @@ export abstract class Screen<
       ...templateLocalization,
       ...this.mapDefaultLocalization(templateLocalization),
     };
-    return templateLocalization;
+    return templateLocalization || {};
   }
 
   private mapDefaultConfiguration(templateConfiguration?: TTemplateConfiguration) {

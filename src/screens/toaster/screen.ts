@@ -1,4 +1,4 @@
-import { Screen, ScreenSettings } from '../../core/screen/screen';
+import { Screen, ScreenDataPayload, ScreenMode, ScreenSettings } from '../../core/screen/screen';
 import { ScreenType } from '../../core/screen/screen-type';
 import { ScreenEvents } from '../../core/screen/events/events';
 import { TemplateTextLocalization } from '../../core/screen/template-localization';
@@ -21,6 +21,11 @@ export class ToasterScreen<
 > extends Screen<ToasterScreenEvents, ToasterScreenConfiguration, TLocalization, TConfiguration> {
   constructor(defaultSettings: ScreenSettings<TLocalization, TConfiguration>) {
     super(ScreenType.Toaster, defaultSettings);
+  }
+
+  protected override onInit({ mode, data }: { mode: ScreenMode; data?: ScreenDataPayload }) {
+    this.screenConfiguration = {};
+    return super.onInit({ mode, data });
   }
 
   protected hideLoadingOnLoad(): boolean {
