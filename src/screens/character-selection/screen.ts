@@ -84,11 +84,10 @@ export class CharacterSelectionScreen<
 
   public async selectCharacter(characterId: string, options?: CharacterLinkOptions) {
     try {
+      await this._gamemodeSessionApi?.linkCharacterToSession({ characterId });
       if (options?.showLoading) {
         this.showLoading(options?.loadingText);
       }
-
-      await this._gamemodeSessionApi?.linkCharacterToSession({ characterId });
     } catch (err) {
       if (options?.showLoading) {
         this.hideLoading();
