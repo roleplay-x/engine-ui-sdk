@@ -1,6 +1,7 @@
 import { SessionContext } from '../context/context';
 import { UIEventEmitter } from '../events/event-emitter';
 import { ScreenType } from '../screen/screen-type';
+import { ScreenNotification } from '../screen/screen-notification';
 
 import {
   ShellCallbackScreen,
@@ -26,6 +27,7 @@ export class ShellBridge {
     window.addEventListener('shell:initializeScreen', this.onInitialize.bind(this));
     window.addEventListener('shell:callbackScreen', this.onCallback.bind(this));
     window.addEventListener('shell:updateScreenData', this.onDataUpdated.bind(this));
+    window.addEventListener('shell:notification', this.onNotification.bind(this));
     window.addEventListener('shell:localeChanged', this.onLocaleChanged.bind(this));
   }
 
@@ -42,6 +44,11 @@ export class ShellBridge {
   private onDataUpdated(event: Event) {
     const customEvent = event as CustomEvent<ShellUpdateScreenData>;
     return this.handleShellDataUpdated(customEvent.detail);
+  }
+
+  private onNotification(event: Event) {
+    const customEvent = event as CustomEvent<ScreenNotification>;
+    return this.handleShellNotification(customEvent.detail);
   }
 
   private onLocaleChanged(event: Event) {
@@ -104,6 +111,14 @@ export class ShellBridge {
       screen: this.screen,
       data,
     });
+  }
+
+  private handleShellNotification(payload: ScreenNotification) {
+    if (payload.screen !== this.screen) {
+      return;
+    }
+
+    this.shellEmitter.emit('shell:notification', payload);
   }
 
   private handleShellLocaleChanged(event: ShellLocaleChanged) {
