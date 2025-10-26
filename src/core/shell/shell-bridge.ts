@@ -161,6 +161,14 @@ export class ShellBridge {
       composed: true,
     });
     window.dispatchEvent(customEvent);
+
+    window.parent.postMessage(
+      {
+        type: `${screen}:${event as string}`,
+        payload,
+      },
+      '*',
+    );
   }
 
   onShellEvent<E extends keyof ShellEvents>(event: E, listener: (payload: ShellEvents[E]) => void) {
