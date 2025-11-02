@@ -18,7 +18,7 @@ export * from './gamemode/client';
 export * from './gamemode/account/api';
 export * from './gamemode/account/request/discord-oauth-token.api-request';
 export * from './gamemode/account/request/implicit-discord-auth.api-request';
-export * from './gamemode/session/api';
+export * from './gamemode/character/api';
 export * from './screens/auth/configuration';
 export * from './screens/auth/screen';
 export * from './screens/toaster/screen';
