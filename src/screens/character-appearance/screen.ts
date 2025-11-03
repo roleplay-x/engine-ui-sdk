@@ -2,6 +2,7 @@ import {
   BaseBlueprintConfigValue,
   BlueprintConfig,
   BlueprintConfigSection,
+  BlueprintConfigType,
   EngineError,
   mapBlueprintConfigValue,
   mapBlueprintConfigValues,
@@ -191,18 +192,21 @@ export class CharacterAppearanceScreen<
       this.enginePlayerApi.getMyCurrentCharacterAppearanceSections(),
     ]);
 
-    this._configs = sections
+    const configs = sections
+      .filter((p) => p.visible)
       .flatMap((p) => p.configs)
-      .reduce((acc, config) => {
-        if (!config) {
-          return acc;
-        }
-        return acc.set(config.key, config);
-      }, new Map<string, BlueprintConfig>());
+      .filter((p) => !!p);
 
-    this._sections = sections;
-    this._appearanceData = character.appearance?.data ?? {};
-    this._initialAppearanceData = { ...this._appearanceData };
+    this._configs = configs.reduce((acc, config) => {
+      if (!config) {
+        return acc;
+      }
+      return acc.set(config.key, config);
+    }, new Map<string, BlueprintConfig>());
+
+    this._sections = sections.filter((p) => p.visible);
+    this._initialAppearanceData = this.getInitialData(character.appearance?.data, configs);
+    this._appearanceData = { ...this._initialAppearanceData };
     this._appearanceValues = mapBlueprintConfigValues(this._configs, this._appearanceData);
 
     this.emitToClient<CharacterAppearanceClientEvents, 'characterAppearancePreview'>(
@@ -225,6 +229,20 @@ export class CharacterAppearanceScreen<
       throw new Error('Screen is not initialized');
     }
     return this._enginePlayerApi;
+  }
+
+  private getInitialData(data: Record<string, string> | undefined, configs: BlueprintConfig[]) {
+    const initialData = data ?? {};
+    const sliderConfigs = configs.filter((p) => p.type === BlueprintConfigType.Slider);
+    sliderConfigs.forEach((config) => {
+      if (!initialData[config.key]) {
+        const value =
+          (config.parameters.slider?.max ?? 0) - (config.parameters.slider?.min ?? 0) / 2;
+
+        initialData[config.key] = Math.max(value, 0).toString();
+      }
+    });
+    return initialData;
   }
 
   protected override hideLoadingOnLoad(): boolean {
