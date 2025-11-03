@@ -88,12 +88,12 @@ export class CharacterAppearanceScreen<
       throw new Error(`Invalid config key ${configKey}`);
     }
 
-    const value = mapBlueprintConfigValue(config, valueKey);
+    const value = mapBlueprintConfigValue(config, valueKey.toString());
     if (!value) {
       throw new Error(`Invalid value key ${valueKey} for ${configKey} config`);
     }
 
-    this.appearanceData[configKey] = valueKey;
+    this.appearanceData[configKey] = valueKey.toString();
     this._appearanceValues = this.appearanceValues.filter((p) => p.configKey !== configKey);
     this._appearanceValues.push(value);
 
@@ -230,15 +230,25 @@ export class CharacterAppearanceScreen<
 
   private getInitialData(data: Record<string, string> | undefined, configs: BlueprintConfig[]) {
     const initialData = data ?? {};
-    const sliderConfigs = configs.filter((p) => p.type === BlueprintConfigType.Slider);
-    sliderConfigs.forEach((config) => {
-      if (!initialData[config.key]) {
-        const max = config.parameters.slider?.max ?? 0;
-        const min = config.parameters.slider?.min ?? 0;
-        const value = (max + min) / 2;
-        initialData[config.key] = Math.max(value, min).toString();
-      }
-    });
+    configs
+      .filter((p) => p.type === BlueprintConfigType.Slider)
+      .forEach((config) => {
+        if (!initialData[config.key]) {
+          const max = config.parameters.slider?.max ?? 0;
+          const min = config.parameters.slider?.min ?? 0;
+          const value = (max + min) / 2;
+          initialData[config.key] = Math.max(value, min).toString();
+        }
+      });
+
+    configs
+      .filter((p) => p.options?.length)
+      .forEach((config) => {
+        if (!initialData[config.key] && config.options?.[0]) {
+          initialData[config.key] = config.options[0].key;
+        }
+      });
+
     return initialData;
   }
 
