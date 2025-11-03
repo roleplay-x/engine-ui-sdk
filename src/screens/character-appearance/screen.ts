@@ -53,7 +53,7 @@ export class CharacterAppearanceScreen<
   TLocalization,
   TConfiguration
 > {
-  private _sections: BlueprintConfigSection[] | undefined;
+  private _sections: ReadonlyArray<BlueprintConfigSection> | undefined;
   private _configs: Map<string, BlueprintConfig> | undefined;
   private _appearanceValues: BaseBlueprintConfigValue[] | undefined;
   private _initialAppearanceData: Record<string, string> | undefined;
@@ -133,7 +133,7 @@ export class CharacterAppearanceScreen<
     return this._appearanceData;
   }
 
-  public get sections(): BlueprintConfigSection[] {
+  public get sections(): ReadonlyArray<BlueprintConfigSection> {
     if (!this._sections) {
       throw new Error('Screen is not initialized');
     }
@@ -192,10 +192,8 @@ export class CharacterAppearanceScreen<
       this.enginePlayerApi.getMyCurrentCharacterAppearanceSections(),
     ]);
 
-    const configs = sections
-      .filter((p) => p.visible)
-      .flatMap((p) => p.configs)
-      .filter((p) => !!p);
+    this._sections = this.getSections(sections);
+    const configs = this._sections.flatMap((p) => this.getSectionConfigs(p));
 
     this._configs = configs.reduce((acc, config) => {
       if (!config) {
@@ -204,7 +202,6 @@ export class CharacterAppearanceScreen<
       return acc.set(config.key, config);
     }, new Map<string, BlueprintConfig>());
 
-    this._sections = sections.filter((p) => p.visible);
     this._initialAppearanceData = this.getInitialData(character.appearance?.data, configs);
     this._appearanceData = { ...this._initialAppearanceData };
     this._appearanceValues = mapBlueprintConfigValues(this._configs, this._appearanceData);
@@ -243,6 +240,24 @@ export class CharacterAppearanceScreen<
       }
     });
     return initialData;
+  }
+
+  private getSections(
+    sections: ReadonlyArray<BlueprintConfigSection>,
+  ): ReadonlyArray<BlueprintConfigSection> {
+    return sections
+      .filter((section) => section.visible)
+      .map((section) => ({
+        ...section,
+        subSections: this.getSections(section.subSections ?? []),
+      }));
+  }
+
+  private getSectionConfigs(section: BlueprintConfigSection): BlueprintConfig[] {
+    const configs = section.configs ?? [];
+    const subConfigs =
+      section.subSections?.flatMap((subSection) => this.getSectionConfigs(subSection)) ?? [];
+    return [...configs, ...subConfigs];
   }
 
   protected override hideLoadingOnLoad(): boolean {
