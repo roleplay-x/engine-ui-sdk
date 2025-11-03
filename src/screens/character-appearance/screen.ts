@@ -35,6 +35,7 @@ export interface CharacterAppearanceScreenConfiguration {}
 export interface CharacterAppearanceClientEvents extends ScreenClientEvents {
   characterAppearancePreview: { values: BaseBlueprintConfigValue[] };
   characterRenderRequested: { values: BaseBlueprintConfigValue[] };
+  sectionSelected: { key: string };
 }
 
 export interface CharacterAppearanceSaveOptions {
@@ -72,6 +73,12 @@ export class CharacterAppearanceScreen<
     this.screenConfiguration = {};
     await this.loadConfiguration();
     return super.onInit({ mode, data });
+  }
+
+  public selectSection(key: string) {
+    this.emitToClient<CharacterAppearanceClientEvents, 'sectionSelected'>('sectionSelected', {
+      key,
+    });
   }
 
   public changeValue(configKey: string, valueKey: string) {
