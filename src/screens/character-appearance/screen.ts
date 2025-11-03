@@ -233,10 +233,10 @@ export class CharacterAppearanceScreen<
     const sliderConfigs = configs.filter((p) => p.type === BlueprintConfigType.Slider);
     sliderConfigs.forEach((config) => {
       if (!initialData[config.key]) {
-        const value =
-          (config.parameters.slider?.max ?? 0) - (config.parameters.slider?.min ?? 0) / 2;
-
-        initialData[config.key] = Math.max(value, 0).toString();
+        const max = config.parameters.slider?.max ?? 0;
+        const min = config.parameters.slider?.min ?? 0;
+        const value = (max + min) / 2;
+        initialData[config.key] = Math.max(value, min).toString();
       }
     });
     return initialData;
