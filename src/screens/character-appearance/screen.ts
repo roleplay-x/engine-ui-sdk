@@ -249,6 +249,14 @@ export class CharacterAppearanceScreen<
         }
       });
 
+    configs
+      .filter((p) => p.colors?.length)
+      .forEach((config) => {
+        if (!initialData[config.key] && config.colors?.[0]) {
+          initialData[config.key] = config.colors[0].key;
+        }
+      });
+
     return initialData;
   }
 
