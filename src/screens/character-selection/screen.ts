@@ -83,17 +83,9 @@ export class CharacterSelectionScreen<
   }
 
   public async selectCharacter(characterId: string, options?: CharacterLinkOptions) {
-    try {
-      await this._gamemodeSessionApi?.linkCharacterToSession({ characterId });
-      if (options?.showLoading) {
-        this.showLoading(options?.loadingText);
-      }
-    } catch (err) {
-      if (options?.showLoading) {
-        this.hideLoading();
-      }
-
-      throw err;
+    await this._gamemodeSessionApi?.linkCharacterToSession({ characterId });
+    if (options?.showLoading) {
+      this.showLoading(options?.loadingText);
     }
   }
 

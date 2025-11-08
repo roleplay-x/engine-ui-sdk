@@ -189,7 +189,7 @@ export class CharacterAppearanceScreen<
   private async loadConfiguration() {
     const [character, sections] = await Promise.all([
       this.enginePlayerApi.getMyCurrentCharacter(),
-      this.enginePlayerApi.getMyCurrentCharacterAppearanceSections(),
+      this.enginePlayerApi.getMyAppearanceSections(),
     ]);
 
     this._sections = this.getSections(sections);

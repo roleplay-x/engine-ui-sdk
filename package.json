@@ -1,6 +1,6 @@
 {
   "name": "@roleplayx/engine-ui-sdk",
-  "version": "0.1.43",
+  "version": "0.1.44",
   "description": "RoleplayX Engine UI SDK",
   "main": "index.js",
   "types": "index.d.ts",
@@ -29,7 +29,7 @@
     "node": "^20.0.0"
   },
   "dependencies": {
-    "@roleplayx/engine-sdk": "^0.1.46",
+    "@roleplayx/engine-sdk": "^0.1.48",
     "axios": "^1.10.0",
     "events": "^3.3.0",
     "uuid": "^11.1.0"
