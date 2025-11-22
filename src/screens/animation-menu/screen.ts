@@ -92,18 +92,18 @@ export class AnimationMenuScreen<
     this.emitToClient<AnimationMenuClientEvents, 'move'>('move', {});
   }
 
+  public get animationCategories(): ReadonlyArray<CharacterAnimationCategory> {
+    if (!this._animationCategories) {
+      throw new Error('Screen is not initialized');
+    }
+    return this._animationCategories;
+  }
+
   private get enginePlayerApi(): PlayerApi {
     if (!this._enginePlayerApi) {
       throw new Error('Screen is not initialized');
     }
     return this._enginePlayerApi;
-  }
-
-  private get animationCategories(): ReadonlyArray<CharacterAnimationCategory> {
-    if (!this._animationCategories) {
-      throw new Error('Screen is not initialized');
-    }
-    return this._animationCategories;
   }
 
   protected override hiddenOnFirstLoad(): boolean {
