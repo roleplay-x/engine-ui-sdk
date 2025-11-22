@@ -229,14 +229,14 @@ export abstract class Screen<
     return message;
   };
 
-  protected get engineClient(): EngineClient {
+  public get engineClient(): EngineClient {
     if (!this._engineClient) {
       throw new Error('Screen is not initialized');
     }
     return this._engineClient;
   }
 
-  protected get gamemodeClient(): GamemodeClient {
+  public get gamemodeClient(): GamemodeClient {
     if (!this._gamemodeClient) {
       throw new Error('Screen is not initialized');
     }
