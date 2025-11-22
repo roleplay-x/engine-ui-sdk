@@ -3,7 +3,12 @@ import { ScreenNotification } from '../../screen/screen-notification';
 
 export interface ScreenShellEvents {
   'screen:readyToInitialize': { screen: ScreenType };
-  'screen:initialized': { screen: ScreenType; templateId: string; hideLoading: boolean };
+  'screen:initialized': {
+    screen: ScreenType;
+    templateId: string;
+    hideLoading: boolean;
+    hiddenOnFirstLoad: boolean;
+  };
   'screen:changeLocale': { fromScreen: ScreenType; locale: string };
   'screen:showLoading': { fromScreen: ScreenType; text: string };
   'screen:hideLoading': { fromScreen: ScreenType };

@@ -82,7 +82,13 @@ export abstract class Screen<
     this.eventEmitter = new UIEventEmitter<TEvents>();
   }
 
-  protected abstract hideLoadingOnLoad(): boolean;
+  protected hideLoadingOnLoad(): boolean {
+    return false;
+  }
+
+  protected hiddenOnFirstLoad(): boolean {
+    return false;
+  }
 
   public readyToInitialize() {
     this.onShell('shell:initializeScreen', async (init: ShellInitializeScreen) => {
@@ -120,6 +126,7 @@ export abstract class Screen<
       screen: this.screen,
       templateId: this._context.templateId,
       hideLoading: this.hideLoadingOnLoad(),
+      hiddenOnFirstLoad: this.hiddenOnFirstLoad(),
     });
 
     if (this._initialCallback) {
