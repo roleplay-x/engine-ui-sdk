@@ -17,9 +17,12 @@ export interface AnimationMenuScreenConfiguration {}
 export interface AnimationMenuClientEvents extends ScreenClientEvents {
   bindAnimations: { animations: ReadonlyArray<CharacterAnimation> };
   playAnimation: { animation: CharacterAnimation };
-  pauseOptionChanged: { pause: boolean };
-  torsoOptionChanged: { torso: boolean };
-  repeatOptionChanged: { repeat: boolean };
+  // eslint-disable-next-line @typescript-eslint/no-empty-object-type
+  enablePositionSelector: {};
+  // eslint-disable-next-line @typescript-eslint/no-empty-object-type
+  pause: {};
+  // eslint-disable-next-line @typescript-eslint/no-empty-object-type
+  repeat: {};
   // eslint-disable-next-line @typescript-eslint/no-empty-object-type
   move: {};
 }
@@ -70,22 +73,19 @@ export class AnimationMenuScreen<
     });
   }
 
-  public changePauseOption(pause: boolean): void {
-    this.emitToClient<AnimationMenuClientEvents, 'pauseOptionChanged'>('pauseOptionChanged', {
-      pause,
-    });
+  public pause(): void {
+    this.emitToClient<AnimationMenuClientEvents, 'pause'>('pause', {});
   }
 
-  public changeTorsoOption(torso: boolean): void {
-    this.emitToClient<AnimationMenuClientEvents, 'torsoOptionChanged'>('torsoOptionChanged', {
-      torso,
-    });
+  public repeat(): void {
+    this.emitToClient<AnimationMenuClientEvents, 'repeat'>('repeat', {});
   }
 
-  public changeRepeatOption(repeat: boolean): void {
-    this.emitToClient<AnimationMenuClientEvents, 'repeatOptionChanged'>('repeatOptionChanged', {
-      repeat,
-    });
+  public enablePositionSelector(): void {
+    this.emitToClient<AnimationMenuClientEvents, 'enablePositionSelector'>(
+      'enablePositionSelector',
+      {},
+    );
   }
 
   public move(): void {
