@@ -55,7 +55,7 @@ export class AnimationMenuScreen<
       animationCategoryId?: string;
       key?: string;
       keyIn?: string;
-      ids?: string;
+      ids?: ReadonlyArray<string>;
     } & PaginationQuery,
   ): Promise<PaginatedItems<CharacterAnimation>> {
     const animations = await this.enginePlayerApi.getMyAnimations(query);
