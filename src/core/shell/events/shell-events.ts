@@ -16,6 +16,8 @@ export interface ShellEvents {
   'shell:initializeScreen': ShellInitializeScreen;
   'shell:callbackScreen': ShellCallbackScreen;
   'shell:updateScreenData': ShellUpdateScreenData;
+  'shell:hideScreen': ShellHideScreenData;
+  'shell:resumeScreen': ShellResumeScreenData;
   'shell:localeChanged': ShellLocaleChanged;
   'shell:notification': ScreenNotification;
 }
@@ -49,4 +51,13 @@ export interface ShellCallbackScreen {
 export interface ShellUpdateScreenData {
   screen: ScreenType;
   data: ScreenDataPayload;
+}
+
+export interface ShellResumeScreenData {
+  screen: ScreenType;
+  data: ScreenDataPayload;
+}
+
+export interface ShellHideScreenData {
+  screen: ScreenType;
 }

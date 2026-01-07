@@ -53,3 +53,5 @@ pids
 
 # Custom
 /.coverage
+
+CLAUDE.md

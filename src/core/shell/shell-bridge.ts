@@ -6,8 +6,10 @@ import { ScreenNotification } from '../screen/screen-notification';
 import {
   ShellCallbackScreen,
   ShellEvents,
+  ShellHideScreenData,
   ShellInitializeScreen,
   ShellLocaleChanged,
+  ShellResumeScreenData,
   ShellUpdateScreenData,
 } from './events/shell-events';
 import { ScreenShellEvents } from './events/screen-shell-events';
@@ -27,6 +29,8 @@ export class ShellBridge {
     window.addEventListener('shell:initializeScreen', this.onInitialize.bind(this));
     window.addEventListener('shell:callbackScreen', this.onCallback.bind(this));
     window.addEventListener('shell:updateScreenData', this.onDataUpdated.bind(this));
+    window.addEventListener('shell:resumeScreen', this.onResume.bind(this));
+    window.addEventListener('shell:hideScreen', this.onHide.bind(this));
     window.addEventListener('shell:notification', this.onNotification.bind(this));
     window.addEventListener('shell:localeChanged', this.onLocaleChanged.bind(this));
   }
@@ -44,6 +48,16 @@ export class ShellBridge {
   private onDataUpdated(event: Event) {
     const customEvent = event as CustomEvent<ShellUpdateScreenData>;
     return this.handleShellDataUpdated(customEvent.detail);
+  }
+
+  private onResume(event: Event) {
+    const customEvent = event as CustomEvent<ShellResumeScreenData>;
+    return this.handleShellResume(customEvent.detail);
+  }
+
+  private onHide(event: Event) {
+    const customEvent = event as CustomEvent<ShellHideScreenData>;
+    return this.handleShellHide(customEvent.detail);
   }
 
   private onNotification(event: Event) {
@@ -110,6 +124,27 @@ export class ShellBridge {
     this.shellEmitter.emit('shell:updateScreenData', {
       screen: this.screen,
       data,
+    });
+  }
+
+  private handleShellResume({ screen, data }: ShellResumeScreenData) {
+    if (screen !== this.screen) {
+      return;
+    }
+
+    this.shellEmitter.emit('shell:resumeScreen', {
+      screen: this.screen,
+      data,
+    });
+  }
+
+  private handleShellHide({ screen }: ShellHideScreenData) {
+    if (screen !== this.screen) {
+      return;
+    }
+
+    this.shellEmitter.emit('shell:hideScreen', {
+      screen: this.screen,
     });
   }
 
