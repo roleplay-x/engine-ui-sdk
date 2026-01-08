@@ -1,6 +1,7 @@
 import {
   EngineClient,
   Locale,
+  Localization,
   PublicApi,
   ServerTemplateConfigType,
   ServerTemplateConfiguration,
@@ -15,12 +16,14 @@ import {
   ShellCallbackScreen,
   ShellEvents,
   ShellInitializeScreen,
+  ShellResumeScreenData,
   ShellUpdateScreenData,
 } from '../shell/events/shell-events';
 import { ScreenShellEvents } from '../shell/events/screen-shell-events';
 import { Toast } from '../../screens/toaster/screen';
 import { ServerConfiguration } from '../server/server-configuration';
 import { ScreenClientEvents } from '../shell/events/screen-client-events';
+import { ServerTranslator } from '../localization/server-translator';
 
 import { ScreenEvents } from './events/events';
 import { ScreenType } from './screen-type';
@@ -67,6 +70,7 @@ export abstract class Screen<
   private _templateConfiguration: TTemplateConfiguration | undefined;
   private _serverConfiguration: ServerConfiguration | undefined;
   private _configuration: TScreenConfiguration | undefined;
+  private _serverTranslator: ServerTranslator | undefined;
   private _locales: Locale[] | undefined;
   private _defaultLocale: string | undefined;
   private _locale: string | undefined;
@@ -76,6 +80,7 @@ export abstract class Screen<
   protected constructor(
     protected readonly screen: ScreenType,
     private readonly defaultSettings: ScreenSettings<TLocalization, TTemplateConfiguration>,
+    private readonly serverLocalizationSections?: ReadonlyArray<keyof Localization[string]>,
   ) {
     this._initialized = false;
     this.shellBridge = new ShellBridge(screen);
@@ -103,6 +108,14 @@ export abstract class Screen<
       await this.onDataUpdated(data);
     });
 
+    this.onShell('shell:resumeScreen', async ({ data }: ShellResumeScreenData) => {
+      await this.onResume(data);
+    });
+
+    this.onShell('shell:hideScreen', async () => {
+      await this.onHide();
+    });
+
     this.onShell('shell:localeChanged', ({ locale, localization }) => {
       return this.onLocaleChanged({ locale, localization });
     });
@@ -113,6 +126,7 @@ export abstract class Screen<
 
     this.emitToShell('screen:readyToInitialize', {
       screen: this.screen,
+      serverLocalizationSections: [...new Set(this.serverLocalizationSections)],
     });
   }
 
@@ -229,6 +243,13 @@ export abstract class Screen<
     return message;
   };
 
+  public get serverTranslator(): ServerTranslator {
+    if (!this._serverTranslator) {
+      throw new Error('Screen is not initialized');
+    }
+    return this._serverTranslator;
+  }
+
   public get engineClient(): EngineClient {
     if (!this._engineClient) {
       throw new Error('Screen is not initialized');
@@ -325,6 +346,10 @@ export abstract class Screen<
 
   protected onDataUpdated(data: ScreenDataPayload): void | Promise<void> {}
 
+  protected onResume(data: ScreenDataPayload): void | Promise<void> {}
+
+  protected onHide(): void | Promise<void> {}
+
   private async setup(init: ShellInitializeScreen) {
     this._context = init.context;
     this._engineClient = createEngineClient(init.context, this.screen);
@@ -341,6 +366,7 @@ export abstract class Screen<
       : this.mapDefaultConfiguration();
 
     this._initialCallback = init.callback;
+    this._serverTranslator = new ServerTranslator(init.serverLocalization ?? {});
     await this.checkTemplateSubscription();
     await this.onInit({ mode: init.mode, data: init.data });
   }

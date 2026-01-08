@@ -1,3 +1,5 @@
+import { Localization } from '@roleplayx/engine-sdk';
+
 import { Screen, ScreenDataPayload, ScreenMode, ScreenSettings } from '../../core/screen/screen';
 import { ScreenType } from '../../core/screen/screen-type';
 import { ScreenEvents } from '../../core/screen/events/events';
@@ -19,8 +21,11 @@ export class ToasterScreen<
   TLocalization extends TemplateTextLocalization,
   TConfiguration extends TemplateConfiguration,
 > extends Screen<ToasterScreenEvents, ToasterScreenConfiguration, TLocalization, TConfiguration> {
-  constructor(defaultSettings: ScreenSettings<TLocalization, TConfiguration>) {
-    super(ScreenType.Toaster, defaultSettings);
+  constructor(
+    defaultSettings: ScreenSettings<TLocalization, TConfiguration>,
+    serverLocalizationSections?: ReadonlyArray<keyof Localization[string]>,
+  ) {
+    super(ScreenType.Toaster, defaultSettings, serverLocalizationSections);
   }
 
   protected override onInit({ mode, data }: { mode: ScreenMode; data?: ScreenDataPayload }) {

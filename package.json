@@ -1,6 +1,6 @@
 {
   "name": "@roleplayx/engine-ui-sdk",
-  "version": "0.1.51",
+  "version": "0.1.52",
   "description": "RoleplayX Engine UI SDK",
   "main": "index.js",
   "types": "index.d.ts",
@@ -29,9 +29,11 @@
     "node": "^20.0.0"
   },
   "dependencies": {
-    "@roleplayx/engine-sdk": "^0.1.62",
+    "@roleplayx/engine-sdk": "^0.1.65",
     "axios": "^1.10.0",
     "events": "^3.3.0",
+    "lodash": "^4.17.21",
+    "moment": "^2.30.1",
     "uuid": "^11.1.0"
   },
   "publishConfig": {
@@ -49,6 +51,7 @@
     "@eslint/js": "^9.31.0",
     "@openapitools/openapi-generator-cli": "^2.21.0",
     "@types/jest": "^30.0.0",
+    "@types/lodash": "^4.17.21",
     "@types/nock": "^11.1.0",
     "@types/node": "^24.0.13",
     "@types/uuid": "^10.0.0",

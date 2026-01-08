@@ -4,6 +4,7 @@ import {
   BlueprintConfigSection,
   BlueprintConfigType,
   EngineError,
+  Localization,
   mapBlueprintConfigValue,
   mapBlueprintConfigValues,
   PlayerApi,
@@ -63,8 +64,11 @@ export class CharacterAppearanceScreen<
   private _enginePlayerApi: PlayerApi | undefined;
   private _gamemodeCharacterApi: GamemodeCharacterApi | undefined;
 
-  constructor(defaultSettings: ScreenSettings<TLocalization, TConfiguration>) {
-    super(ScreenType.CharacterAppearance, defaultSettings);
+  constructor(
+    defaultSettings: ScreenSettings<TLocalization, TConfiguration>,
+    serverLocalizationSections?: ReadonlyArray<keyof Localization[string]>,
+  ) {
+    super(ScreenType.CharacterAppearance, defaultSettings, serverLocalizationSections);
     this.on('characterRendered', this.onCharacterRendered.bind(this));
   }
 

@@ -1,4 +1,9 @@
-import { CharacterAnimation, CharacterAnimationCategory, PlayerApi } from '@roleplayx/engine-sdk';
+import {
+  CharacterAnimation,
+  CharacterAnimationCategory,
+  Localization,
+  PlayerApi,
+} from '@roleplayx/engine-sdk';
 import { PaginationQuery } from '@roleplayx/engine-sdk/common/pagination-query';
 import { PaginatedItems } from '@roleplayx/engine-sdk/common/paginated-items';
 
@@ -39,8 +44,11 @@ export class AnimationMenuScreen<
   private _enginePlayerApi: PlayerApi | undefined;
   private _animationCategories: ReadonlyArray<CharacterAnimationCategory> | undefined;
 
-  constructor(defaultSettings: ScreenSettings<TLocalization, TConfiguration>) {
-    super(ScreenType.AnimationMenu, defaultSettings);
+  constructor(
+    defaultSettings: ScreenSettings<TLocalization, TConfiguration>,
+    serverLocalizationSections?: ReadonlyArray<keyof Localization[string]>,
+  ) {
+    super(ScreenType.AnimationMenu, defaultSettings, serverLocalizationSections);
   }
 
   protected override async onInit({ mode, data }: { mode: ScreenMode; data?: ScreenDataPayload }) {

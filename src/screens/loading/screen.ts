@@ -1,3 +1,5 @@
+import { Localization } from '@roleplayx/engine-sdk';
+
 import { Screen, ScreenDataPayload, ScreenMode, ScreenSettings } from '../../core/screen/screen';
 import { ScreenType } from '../../core/screen/screen-type';
 import { ScreenEvents } from '../../core/screen/events/events';
@@ -23,8 +25,11 @@ export class LoadingScreen<
 > extends Screen<LoadingScreenEvents, LoadingScreenConfiguration, TLocalization, TConfiguration> {
   private _text: string = '';
 
-  constructor(defaultSettings: ScreenSettings<TLocalization, TConfiguration>) {
-    super(ScreenType.Loading, defaultSettings);
+  constructor(
+    defaultSettings: ScreenSettings<TLocalization, TConfiguration>,
+    serverLocalizationSections?: ReadonlyArray<keyof Localization[string]>,
+  ) {
+    super(ScreenType.Loading, defaultSettings, serverLocalizationSections);
   }
 
   protected override onInit({ mode, data }: { mode: ScreenMode; data?: ScreenDataPayload }) {

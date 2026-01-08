@@ -1,4 +1,4 @@
-import { Locale, ServerTemplateConfiguration } from '@roleplayx/engine-sdk';
+import { Locale, Localization, ServerTemplateConfiguration } from '@roleplayx/engine-sdk';
 
 import { SessionContext } from '../../context/context';
 import { ScreenNotification } from '../../screen/screen-notification';
@@ -32,6 +32,7 @@ export interface ShellInitializeScreen {
   screen: ScreenType;
   context: SessionContext;
   localization?: TemplateTextLocalization;
+  serverLocalization?: Localization;
   templateConfiguration?: Array<ServerTemplateConfiguration>;
   serverConfiguration: ServerConfiguration;
   locales: Locale[];

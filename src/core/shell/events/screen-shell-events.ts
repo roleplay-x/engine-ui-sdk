@@ -1,8 +1,13 @@
+import { Localization } from '@roleplayx/engine-sdk';
+
 import { ScreenType } from '../../screen/screen-type';
 import { ScreenNotification } from '../../screen/screen-notification';
 
 export interface ScreenShellEvents {
-  'screen:readyToInitialize': { screen: ScreenType };
+  'screen:readyToInitialize': {
+    screen: ScreenType;
+    serverLocalizationSections?: ReadonlyArray<keyof Localization[string]>;
+  };
   'screen:initialized': {
     screen: ScreenType;
     templateId: string;

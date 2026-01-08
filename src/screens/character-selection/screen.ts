@@ -4,6 +4,7 @@ import {
   CharacterNationality,
   CharacterSummary,
   CreateMyCharacterRequest,
+  Localization,
   PlayerApi,
 } from '@roleplayx/engine-sdk';
 
@@ -46,8 +47,11 @@ export class CharacterSelectionScreen<
   private _enginePlayerApi: PlayerApi | undefined;
   private _gamemodeSessionApi: GamemodeSessionApi | undefined;
 
-  constructor(defaultSettings: ScreenSettings<TLocalization, TConfiguration>) {
-    super(ScreenType.CharacterSelection, defaultSettings);
+  constructor(
+    defaultSettings: ScreenSettings<TLocalization, TConfiguration>,
+    serverLocalizationSections?: ReadonlyArray<keyof Localization[string]>,
+  ) {
+    super(ScreenType.CharacterSelection, defaultSettings, serverLocalizationSections);
   }
 
   protected override async onInit({ mode, data }: { mode: ScreenMode; data?: ScreenDataPayload }) {

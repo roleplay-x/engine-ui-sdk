@@ -9,6 +9,7 @@ import {
   ExternalLoginPreAuthResult,
   ForgotPasswordRequest,
   GrantAccessResult,
+  Localization,
   PublicApi,
   RedirectUri,
   RegisterAccountRequest,
@@ -57,8 +58,11 @@ export class AuthScreen<
   private _gamemodeSessionApi: GamemodeSessionApi | undefined;
   private _enginePublicApi: PublicApi | undefined;
 
-  constructor(defaultSettings: ScreenSettings<TLocalization, TConfiguration>) {
-    super(ScreenType.Auth, defaultSettings);
+  constructor(
+    defaultSettings: ScreenSettings<TLocalization, TConfiguration>,
+    serverLocalizationSections?: ReadonlyArray<keyof Localization[string]>,
+  ) {
+    super(ScreenType.Auth, defaultSettings, serverLocalizationSections);
   }
 
   protected async onInit({

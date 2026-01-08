@@ -1,4 +1,4 @@
-import { PlayerApi, SpawnLocation } from '@roleplayx/engine-sdk';
+import { Localization, PlayerApi, SpawnLocation } from '@roleplayx/engine-sdk';
 
 import { Screen, ScreenDataPayload, ScreenMode, ScreenSettings } from '../../core/screen/screen';
 import { ScreenType } from '../../core/screen/screen-type';
@@ -36,8 +36,11 @@ export class SpawnLocationSelectionScreen<
   private _enginePlayerApi: PlayerApi | undefined;
   private _gamemodeCharacterApi: GamemodeCharacterApi | undefined;
 
-  constructor(defaultSettings: ScreenSettings<TLocalization, TConfiguration>) {
-    super(ScreenType.SpawnLocationSelection, defaultSettings);
+  constructor(
+    defaultSettings: ScreenSettings<TLocalization, TConfiguration>,
+    serverLocalizationSections?: ReadonlyArray<keyof Localization[string]>,
+  ) {
+    super(ScreenType.SpawnLocationSelection, defaultSettings, serverLocalizationSections);
   }
 
   protected override async onInit({ mode, data }: { mode: ScreenMode; data?: ScreenDataPayload }) {
