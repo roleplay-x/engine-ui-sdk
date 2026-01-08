@@ -70,6 +70,7 @@ export class LocalShell {
         sessionToken,
       },
       serverConfiguration,
+      serverLocalization: await publicApi.getLocalization(),
       locale: locale ?? 'en-US',
       defaultLocale: serverConfiguration.DEFAULT_LANGUAGE?.value?.key ?? 'en-US',
       locales,
