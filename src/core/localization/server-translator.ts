@@ -1,4 +1,4 @@
-import { ErrorTranslation, Localization, LocalizationData } from '@roleplayx/engine-sdk';
+import { ErrorTranslation, LocalizationData } from '@roleplayx/engine-sdk';
 
 type HasIndexSignature<T> = string extends keyof T ? true : false;
 
@@ -30,9 +30,9 @@ export type TopLevelItemType<K extends TopLevelSections> = ExtractRecordValue<
 >;
 
 export class ServerTranslator {
-  private readonly _localization: Localization;
+  private readonly _localization: LocalizationData;
 
-  constructor(localization: Localization) {
+  constructor(localization: LocalizationData) {
     this._localization = localization;
   }
 
